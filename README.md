@@ -1,6 +1,8 @@
 # Sharingan
 
-![ItachiSharingan](sharingan.jpg)
+<p align="center">
+	<img src="./sharingan.jpg" width="50%" >
+</p>
 
 Sharingan is a tool used for automated or manual scans of a domains / websites for offensive security and bug bounty hunting. This tool will mostly just call other tools and comprise a list of results and possible vulns. 
 
