@@ -6,19 +6,26 @@ import (
 	"log"
 	"os"
 	"time"
+    "bufio"
+    "net"
+    "strings"
 
 	"github.com/Ullaakut/nmap"
 	"github.com/urfave/cli"
 )
 
 func main() {
+    DNSBruteForce("yahoo.com", "/home/ae86/ostools/SecLists/Discovery/DNS/namelist.txt")
+}
+
+func SetupCLI() {
 	sharingan := cli.NewApp()
 	sharingan.Name = "Sharingan"
 	sharingan.Usage = "Wrapper and analyzer for offensive security recon tools"
 
 	sharingan.Action = func(c *cli.Context) error {
 		target := c.Args().Get(0)
-		ScanTarget(target)
+		NMAPScan(target)
 		return nil
 	}
 
@@ -26,10 +33,45 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func DNSBruteForce(target string, wordlistPath string) {
+    wordlist, err := os.Open(wordlistPath)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    defer wordlist.Close()
+
+    scanner := bufio.NewScanner(wordlist)
+    for scanner.Scan() {
+        subdomain := scanner.Text() + "." + target;
+        subdomain = strings.Replace(subdomain, " ", "", -1);
+
+        ips, err := ResolveDNS(subdomain)
+        if err == nil {
+            fmt.Printf("%v", ips)
+        } else {
+        }
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+}
+
+func ResolveDNS(subdomain string) ([]string, error) {
+    ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+    defer cancel()
+
+    return net.DefaultResolver.LookupHost(ctx, subdomain)
+}
+
+func DNSLookup() {
 
 }
 
-func ScanTarget(target string) {
+func NMAPScan(target string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
