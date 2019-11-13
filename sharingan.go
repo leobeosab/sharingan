@@ -10,22 +10,42 @@ import (
     "net"
     "strings"
 
+    "text/tabwriter"
+
 	"github.com/Ullaakut/nmap"
 	"github.com/urfave/cli"
 )
 
 func main() {
-    DNSBruteForce("yahoo.com", "/home/ae86/ostools/SecLists/Discovery/DNS/namelist.txt")
+    SetupCLI()
 }
 
 func SetupCLI() {
+
+    var dnsWordlist string
+    var target string
+
 	sharingan := cli.NewApp()
 	sharingan.Name = "Sharingan"
 	sharingan.Usage = "Wrapper and analyzer for offensive security recon tools"
 
+    sharingan.Flags = []cli.Flag {
+        cli.StringFlag{
+            Name: "dns-wordlist",
+            Value: "",
+            Usage: "Wordlist for DNS bruteforcing",
+            Destination: &dnsWordlist,
+        },
+        cli.StringFlag{
+            Name: "target",
+            Value: "",
+            Usage: "Target domain",
+            Destination: &target,
+        },
+    }
+
 	sharingan.Action = func(c *cli.Context) error {
-		target := c.Args().Get(0)
-		NMAPScan(target)
+        RunDNSRecon(target, dnsWordlist)
 		return nil
 	}
 
@@ -35,13 +55,38 @@ func SetupCLI() {
 	}
 }
 
-func DNSBruteForce(target string, wordlistPath string) {
+func RunDNSRecon(target string, wordlistPath string) {
+
+    if (target == "") {
+        log.Fatal("Target needs to be defined")
+    }
+
+    if (wordlistPath == "") {
+        log.Fatal("DNS Wordlist needs to be defined")
+    }
+
+    w := new(tabwriter.Writer)
+    w.Init(os.Stdout, 8, 8, 0, '\t', 0)
+
+    validSubdomains := DNSBruteForce(target, wordlistPath)
+
+    fmt.Fprintf(w, "\n%s\t%s\t", "Subdomain Address ", "| IP List")
+    fmt.Fprintf(w, "\n%s\t%s\t", "----------------- ", "| -------")
+    for subdomain, ips := range validSubdomains {
+        fmt.Fprintf(w, "\n%s \t| %v\t", subdomain, ips)
+    }
+
+    w.Flush()
+}
+
+func DNSBruteForce(target string, wordlistPath string) (map[string][]string) {
     wordlist, err := os.Open(wordlistPath)
     if err != nil {
         log.Fatal(err)
     }
-
     defer wordlist.Close()
+
+    var subdomainMap = make(map[string][]string)
 
     scanner := bufio.NewScanner(wordlist)
     for scanner.Scan() {
@@ -50,14 +95,15 @@ func DNSBruteForce(target string, wordlistPath string) {
 
         ips, err := ResolveDNS(subdomain)
         if err == nil {
-            fmt.Printf("%v", ips)
-        } else {
+            subdomainMap[subdomain] = ips
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Fatal(err)
     }
+
+    return subdomainMap
 }
 
 func ResolveDNS(subdomain string) ([]string, error) {
@@ -78,6 +124,7 @@ func NMAPScan(target string) {
 	scanner, err := nmap.NewScanner(
 		nmap.WithTargets(target),
 		nmap.WithContext(ctx),
+        nmap.WithFastMode(),
 	)
 
 	if err != nil {
