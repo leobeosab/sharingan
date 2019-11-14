@@ -13,5 +13,3 @@ This is very much a work in progress and I'm relatively new to offensive securit
 
 ## Usage
 sharingan --target target.com --dns-wordlist /path/to/wordlist/
-
-word list cannot understand what ~/ means yet so have it search from root or a relative path. This will be fixed shortly
