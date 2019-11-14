@@ -2,40 +2,13 @@ package dns
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
     "bufio"
     "net"
     "strings"
-
-    "text/tabwriter"
 )
-
-func RunDNSRecon(target string, wordlistPath string) {
-
-    if (target == "") {
-        log.Fatal("Target needs to be defined")
-    }
-
-    if (wordlistPath == "") {
-        log.Fatal("DNS Wordlist needs to be defined")
-    }
-
-    w := new(tabwriter.Writer)
-    w.Init(os.Stdout, 8, 8, 0, '\t', 0)
-
-    validSubdomains := DNSBruteForce(target, wordlistPath)
-
-    fmt.Fprintf(w, "\n%s\t%s\t", "Subdomain Address ", "| IP List")
-    fmt.Fprintf(w, "\n%s\t%s\t", "----------------- ", "| -------")
-    for subdomain, ips := range validSubdomains {
-        fmt.Fprintf(w, "\n%s \t| %v\t", subdomain, ips)
-    }
-
-    w.Flush()
-}
 
 func DNSBruteForce(target string, wordlistPath string) (map[string][]string) {
     wordlist, err := os.Open(wordlistPath)
