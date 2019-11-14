@@ -9,6 +9,7 @@ import (
 
 	"github.com/urfave/cli"
     "github.com/leobeosab/sharingan/pkg/dns"
+    "github.com/leobeosab/sharingan/pkg/nmap"
 )
 
 func SetupCLI() {
@@ -64,7 +65,9 @@ func RunDNSRecon(target string, wordlistPath string) {
     fmt.Fprintf(w, "\n%s\t%s\t", "Subdomain Address ", "| IP List")
     fmt.Fprintf(w, "\n%s\t%s\t", "----------------- ", "| -------")
     for subdomain, ips := range validSubdomains {
-        fmt.Fprintf(w, "\n%s \t| %v\t", subdomain, ips)
+        if (nmap.CheckHost(subdomain)) {
+            fmt.Fprintf(w, "\n%s \t| %v\t", subdomain, ips)
+        }
     }
 
     w.Flush()

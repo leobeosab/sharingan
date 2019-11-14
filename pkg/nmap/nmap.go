@@ -4,15 +4,30 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"time"
-    "bufio"
-    "strings"
 
 	"github.com/Ullaakut/nmap"
 )
 
-func NMAPScan(target string) {
+func CheckHost(target string) (bool) {
+    scanner, err := nmap.NewScanner(
+        nmap.WithTargets(target),
+        nmap.WithPingScan(),
+    )
+
+    if err != nil {
+		log.Panicf("Unable to create nmap scanner: %v", err)
+	}
+
+	result, err := scanner.Run()
+	if err != nil {
+		log.Panicf("Unable to run nmap scan: %v", err)
+	}
+
+    return len(result.Hosts) > 0 && len(result.Hosts[0].Addresses) > 0
+}
+
+func Scan(target string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
