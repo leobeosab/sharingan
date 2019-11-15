@@ -9,9 +9,17 @@ import (
 	"github.com/Ullaakut/nmap"
 )
 
-func CheckHost(target string) (bool) {
+func FilterHosts(targets *map[string][]string) {
+    targetSlice := make([]string, len(*targets))
+
+    i := 0
+    for d := range *targets {
+        targetSlice[i] = d
+        i++
+    }
+
     scanner, err := nmap.NewScanner(
-        nmap.WithTargets(target),
+        nmap.WithTargets(targetSlice...),
         nmap.WithPingScan(),
     )
 
@@ -24,7 +32,15 @@ func CheckHost(target string) (bool) {
 		log.Panicf("Unable to run nmap scan: %v", err)
 	}
 
-    return len(result.Hosts) > 0 && len(result.Hosts[0].Addresses) > 0
+    for _, result := range result.Hosts {
+        if (result.Status.State == "up") {
+            continue
+        }
+
+        for _, host := range result.Hostnames {
+            delete(*targets, host.Name)
+        }
+    }
 }
 
 func Scan(target string) {

@@ -62,12 +62,12 @@ func RunDNSRecon(target string, wordlistPath string) {
 
     validSubdomains := dns.DNSBruteForce(target, wordlistPath)
 
+    nmap.FilterHosts(&validSubdomains)
+
     fmt.Fprintf(w, "\n%s\t%s\t", "Subdomain Address ", "| IP List")
     fmt.Fprintf(w, "\n%s\t%s\t", "----------------- ", "| -------")
     for subdomain, ips := range validSubdomains {
-        if (nmap.CheckHost(subdomain)) {
-            fmt.Fprintf(w, "\n%s \t| %v\t", subdomain, ips)
-        }
+        fmt.Fprintf(w, "\n%s \t| %v\t", subdomain, ips)
     }
 
     w.Flush()
