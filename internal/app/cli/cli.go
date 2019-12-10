@@ -22,13 +22,13 @@ func SetupCLI() {
 	sharingan.Usage = "Wrapper and analyzer for offensive security recon tools"
 
     sharingan.Flags = []cli.Flag {
-        cli.StringFlag{
+        &cli.StringFlag{
             Name: "dns-wordlist",
             Value: "",
             Usage: "Wordlist for DNS bruteforcing",
             Destination: &dnsWordlist,
         },
-        cli.StringFlag{
+        &cli.StringFlag{
             Name: "target",
             Value: "",
             Usage: "Target domain",
