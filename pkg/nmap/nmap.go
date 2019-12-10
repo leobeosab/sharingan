@@ -19,7 +19,7 @@ func CheckHost(target string) (bool) {
 		log.Panicf("Unable to create nmap scanner: %v", err)
 	}
 
-	result, err := scanner.Run()
+	result, _, err := scanner.Run()
 	if err != nil {
 		log.Panicf("Unable to run nmap scan: %v", err)
 	}
@@ -41,7 +41,7 @@ func Scan(target string) {
 		log.Fatalf("Unable to create nmap scanner: %v", err)
 	}
 
-	result, err := scanner.Run()
+	result, _, err := scanner.Run()
 	if err != nil {
 		log.Fatalf("Unable to run nmap scan: %v", err)
 	}
