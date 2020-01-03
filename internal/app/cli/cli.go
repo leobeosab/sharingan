@@ -1,43 +1,51 @@
 package cli
 
 import (
+	"fmt"
 	"log"
-    "os"
-    "fmt"
+	"os"
 
-    "text/tabwriter"
+	"text/tabwriter"
 
+	"github.com/leobeosab/sharingan/internal/models"
+	"github.com/leobeosab/sharingan/pkg/dns"
+	"github.com/leobeosab/sharingan/pkg/nmap"
+	"github.com/leobeosab/sharingan/pkg/storage"
 	"github.com/urfave/cli"
-    "github.com/leobeosab/sharingan/pkg/dns"
-    "github.com/leobeosab/sharingan/pkg/nmap"
 )
 
 func SetupCLI() {
 
-    var dnsWordlist string
-    var target string
+	settings := &models.ScanSettings{}
+
+	settings.Store = storage.OpenStore()
 
 	sharingan := cli.NewApp()
 	sharingan.Name = "Sharingan"
 	sharingan.Usage = "Wrapper and analyzer for offensive security recon tools"
 
-    sharingan.Flags = []cli.Flag {
-        &cli.StringFlag{
-            Name: "dns-wordlist",
-            Value: "",
-            Usage: "Wordlist for DNS bruteforcing",
-            Destination: &dnsWordlist,
-        },
-        &cli.StringFlag{
-            Name: "target",
-            Value: "",
-            Usage: "Target domain",
-            Destination: &target,
-        },
-    }
+	sharingan.Flags = []cli.Flag{
+		&cli.StringFlag{
+			Name:        "dns-wordlist",
+			Value:       "",
+			Usage:       "Wordlist for DNS bruteforcing",
+			Destination: &settings.DNSWordlist,
+		},
+		&cli.StringFlag{
+			Name:        "target",
+			Value:       "",
+			Usage:       "Target domain",
+			Destination: &settings.Target,
+		},
+		&cli.BoolFlag{
+			Name:        "skip-probe",
+			Usage:       "Skips host-up nmap scan",
+			Destination: &settings.SkipProbe,
+		},
+	}
 
 	sharingan.Action = func(c *cli.Context) error {
-        RunDNSRecon(target, dnsWordlist)
+		RunDNSRecon(settings)
 		return nil
 	}
 
@@ -47,28 +55,44 @@ func SetupCLI() {
 	}
 }
 
-func RunDNSRecon(target string, wordlistPath string) {
+func RunDNSRecon(settings *models.ScanSettings) {
+	if settings.Target == "" {
+		log.Fatal("Target needs to be defined")
+	}
 
-    if (target == "") {
-        log.Fatal("Target needs to be defined")
-    }
+	if settings.DNSWordlist == "" {
+		log.Fatal("DNS Wordlist needs to be defined")
+	}
 
-    if (wordlistPath == "") {
-        log.Fatal("DNS Wordlist needs to be defined")
-    }
+	var s models.ScanResults
 
-    w := new(tabwriter.Writer)
-    w.Init(os.Stdout, 8, 8, 0, '\t', 0)
+	r := storage.RetrieveScanResults(settings.Store, settings.Target)
+	if len(r) == 0 {
+		s = models.ScanResults{
+			RootDomain: settings.Target,
+		}
 
-    validSubdomains := dns.DNSBruteForce(target, wordlistPath)
+		s.Hosts = dns.DNSBruteForce(settings.Target, settings.DNSWordlist)
 
-    nmap.FilterHosts(&validSubdomains)
+		if !settings.SkipProbe {
+			nmap.FilterHosts(&s.Hosts)
+		}
 
-    fmt.Fprintf(w, "\n%s\t%s\t", "Subdomain Address ", "| IP List")
-    fmt.Fprintf(w, "\n%s\t%s\t", "----------------- ", "| -------")
-    for subdomain, ips := range validSubdomains {
-        fmt.Fprintf(w, "\n%s \t| %v\t", subdomain, ips)
-    }
+		storage.SaveScan(settings.Store, &s)
+	} else {
+		s = r[0]
+		fmt.Println("Found previous scan")
+	}
 
-    w.Flush()
+	// Pretty print the results
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
+
+	fmt.Fprintf(w, "\n%s\t%s\t", "Host Address ", "| Subdomain List")
+	fmt.Fprintf(w, "\n%s\t%s\t", "----------------- ", "| -------")
+	for _, h := range s.Hosts {
+		fmt.Fprintf(w, "\n%s \t| %v\t", h.IP, h.Subdomains)
+	}
+
+	w.Flush()
 }
