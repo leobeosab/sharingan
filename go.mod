@@ -8,6 +8,6 @@ require (
 	github.com/objectbox/objectbox-go v1.1.0 // indirect
 	github.com/timshannon/bolthold v0.0.0-20191212204344-59576e1e7b0b
 	github.com/urfave/cli v1.22.2
-	go.etcd.io/bbolt v1.3.3 // indirect
+	go.etcd.io/bbolt v1.3.3
 	golang.org/x/sys v0.0.0-20200102141924-c96a22e43c9c // indirect
 )

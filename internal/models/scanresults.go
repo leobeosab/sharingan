@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type Scan struct {
+type ScanResults struct {
 	RootDomain      string
 	Hosts           []Host
 	DateLastScanned time.Time
