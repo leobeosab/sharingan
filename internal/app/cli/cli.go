@@ -42,6 +42,11 @@ func SetupCLI() {
 			Usage:       "Skips host-up nmap scan",
 			Destination: &settings.SkipProbe,
 		},
+		&cli.BoolFlag{
+			Name:        "rescan",
+			Usage:       "Scans domain regardless of the existance of previous results",
+			Destination: &settings.Rescan,
+		},
 	}
 
 	sharingan.Action = func(c *cli.Context) error {
@@ -67,7 +72,7 @@ func RunDNSRecon(settings *models.ScanSettings) {
 	var s models.ScanResults
 
 	r := storage.RetrieveScanResults(settings.Store, settings.Target)
-	if len(r) == 0 {
+	if len(r) == 0 || settings.Rescan {
 		s = models.ScanResults{
 			RootDomain: settings.Target,
 		}
@@ -78,7 +83,11 @@ func RunDNSRecon(settings *models.ScanSettings) {
 			nmap.FilterHosts(&s.Hosts)
 		}
 
-		storage.SaveScan(settings.Store, &s)
+		if settings.Rescan {
+			storage.UpdateScan(settings.Store, &s)
+		} else {
+			storage.SaveScan(settings.Store, &s)
+		}
 	} else {
 		s = r[0]
 		fmt.Println("Found previous scan")

@@ -6,5 +6,6 @@ type ScanSettings struct {
 	DNSWordlist string
 	Target      string
 	SkipProbe   bool
+	Rescan      bool
 	Store       *bolthold.Store
 }
