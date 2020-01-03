@@ -7,23 +7,27 @@ import (
 	"time"
 
 	"github.com/Ullaakut/nmap"
+	"github.com/leobeosab/sharingan/internal/models"
 )
 
-func FilterHosts(targets *map[string][]string) {
-    targetSlice := make([]string, len(*targets))
+func FilterHosts(targets *[]models.Host) {
+	targetSlice := make([]string, len(*targets))
+	// makes deletion trivial
+	targetMap := make(map[string]models.Host)
 
-    i := 0
-    for d := range *targets {
-        targetSlice[i] = d
-        i++
-    }
+	i := 0
+	for _, h := range *targets {
+		targetSlice[i] = h.IP
+		targetMap[h.IP] = h
+		i++
+	}
 
-    scanner, err := nmap.NewScanner(
-        nmap.WithTargets(targetSlice...),
-        nmap.WithPingScan(),
-    )
+	scanner, err := nmap.NewScanner(
+		nmap.WithTargets(targetSlice...),
+		nmap.WithPingScan(),
+	)
 
-    if err != nil {
+	if err != nil {
 		log.Panicf("Unable to create nmap scanner: %v", err)
 	}
 
@@ -32,15 +36,22 @@ func FilterHosts(targets *map[string][]string) {
 		log.Panicf("Unable to run nmap scan: %v", err)
 	}
 
-    for _, result := range result.Hosts {
-        if (result.Status.State == "up") {
-            continue
-        }
+	// Gather off public internet addresses and discard
+	for _, r := range result.Hosts {
+		if r.Status.State == "up" {
+			continue
+		}
 
-        for _, host := range result.Hostnames {
-            delete(*targets, host.Name)
-        }
-    }
+		for _, a := range r.Addresses {
+			delete(targetMap, a.Addr)
+		}
+	}
+	filtered := make([]models.Host, 0)
+	for _, h := range targetMap {
+		filtered = append(filtered, h)
+	}
+
+	*targets = filtered
 }
 
 func Scan(target string) {
@@ -50,7 +61,7 @@ func Scan(target string) {
 	scanner, err := nmap.NewScanner(
 		nmap.WithTargets(target),
 		nmap.WithContext(ctx),
-        nmap.WithFastMode(),
+		nmap.WithFastMode(),
 	)
 
 	if err != nil {
