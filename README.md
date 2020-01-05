@@ -6,13 +6,21 @@
 
 Sharingan is a recon multitool for offensive security / bug bounty
 
+Currently the only working features are DNS bruteforcing and checking if the host is up using nmap
+
 This is very much a work in progress and I'm relatively new to offensive security in general so if you see something that can be improved please open an issue or PR with suggested changes.
 
 ## Cloning
 `go get github.com/leobeosab/sharingan`
 
+## Dependencies
+*   NMap
+*   Go
+
 ## Usage
 sharingan --target target.com --dns-wordlist /path/to/wordlist/
+
+![example gif](./example.gif)
 
 ## Help
 ```
@@ -37,3 +45,12 @@ GLOBAL OPTIONS:
    --help, -h            show help
    --version, -v         print the version
 ```
+
+## TODO
+*   Better progress bars
+*   Concurrent DNS bruteforce
+*   JSON and regular file exports
+*   Automated scans through a daemon?
+*   Dir brute forcing
+*   NMap full service scans
+*   Possible Web ui / html export
