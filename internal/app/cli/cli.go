@@ -19,6 +19,7 @@ func SetupCLI() {
 	settings := &models.ScanSettings{}
 
 	settings.Store = storage.OpenStore()
+	defer settings.Store.Close()
 
 	sharingan := cli.NewApp()
 	sharingan.Name = "Sharingan"
@@ -93,6 +94,8 @@ func RunDNSRecon(settings *models.ScanSettings) {
 		fmt.Println("Found previous scan")
 	}
 
+	// Get a few lines of space before final result
+	fmt.Printf("\n\n")
 	// Pretty print the results
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
