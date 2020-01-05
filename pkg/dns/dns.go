@@ -3,13 +3,16 @@ package dns
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/leobeosab/sharingan/internal/helpers"
 	"github.com/leobeosab/sharingan/internal/models"
+	"github.com/schollz/progressbar/v2"
 )
 
 func DNSBruteForce(target string, wordlistPath string) []models.Host {
@@ -19,6 +22,12 @@ func DNSBruteForce(target string, wordlistPath string) []models.Host {
 		log.Fatal(err)
 	}
 	defer wordlist.Close()
+
+	// Output information to the users
+	fmt.Printf("\n\nBeginnning DNS Brute Force\n")
+	// Progress bar :: Needs refactoring
+	lines := helpers.GetNumberOfLinesInFile(wordlist)
+	progress := progressbar.NewOptions(lines, progressbar.OptionSetPredictTime(false))
 
 	// map[host][]subdomains
 	var hostmap = make(map[string][]string)
@@ -38,6 +47,8 @@ func DNSBruteForce(target string, wordlistPath string) []models.Host {
 				hostmap[ip] = []string{subdomain}
 			}
 		}
+
+		progress.Add(1)
 	}
 
 	if err := wlstream.Err(); err != nil {

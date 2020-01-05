@@ -11,6 +11,8 @@ import (
 )
 
 func FilterHosts(targets *[]models.Host) {
+	fmt.Printf("\n\nChecking if hosts are up...")
+
 	targetSlice := make([]string, len(*targets))
 	// makes deletion trivial
 	targetMap := make(map[string]models.Host)

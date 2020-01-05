@@ -54,7 +54,8 @@ func RetrieveScanResults(s *bolthold.Store, d string) []models.ScanResults {
 	err := s.Find(&results, bolthold.Where("RootDomain").Eq(d))
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println("No previous scan found")
+		results = []models.ScanResults{models.ScanResults{}}
 	}
 
 	return results
