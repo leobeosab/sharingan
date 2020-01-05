@@ -13,3 +13,27 @@ This is very much a work in progress and I'm relatively new to offensive securit
 
 ## Usage
 sharingan --target target.com --dns-wordlist /path/to/wordlist/
+
+## Help
+```
+▶ sharingancli --help
+NAME:
+   Sharingan - Wrapper and analyzer for offensive security recon tools
+
+USAGE:
+   sharingancli [global options] command [command options] [arguments...]
+
+VERSION:
+   0.0.0
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --dns-wordlist value  Wordlist for DNS bruteforcing
+   --target value        Target domain
+   --skip-probe          Skips host-up nmap scan
+   --rescan              Scans domain regardless of the existance of previous results
+   --help, -h            show help
+   --version, -v         print the version
+```
