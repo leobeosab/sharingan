@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/Ullaakut/nmap v2.0.0+incompatible
 	github.com/boltdb/bolt v1.3.1
+	github.com/manifoldco/promptui v0.6.0
 	github.com/objectbox/objectbox-go v1.1.0 // indirect
 	github.com/schollz/progressbar v1.0.0
 	github.com/schollz/progressbar/v2 v2.15.0
