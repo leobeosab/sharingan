@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/leobeosab/sharingan/internal/helpers"
@@ -32,24 +33,44 @@ func DNSBruteForce(target string, wordlistPath string) []models.Host {
 	// map[host][]subdomains
 	var hostmap = make(map[string][]string)
 
+	mux := &sync.Mutex{}
+	jobs := make(chan string)
+	var wg sync.WaitGroup
+
+	for i := 0; i < 20; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			for domain := range jobs {
+				ip := ResolveDNS(domain)
+				if ip != "Error" {
+					mux.Lock()
+					// if ip exists in hostmap do the following
+					if _, ok := hostmap[ip]; ok {
+						hostmap[ip] = append(hostmap[ip], domain)
+					} else {
+						hostmap[ip] = []string{domain}
+					}
+					mux.Unlock()
+				}
+
+				progress.Add(1)
+			}
+		}()
+	}
+
 	// Stream wordlist to resolve DNS
 	wlstream := bufio.NewScanner(wordlist)
 	for wlstream.Scan() {
 		subdomain := wlstream.Text() + "." + target
 		subdomain = strings.Replace(subdomain, " ", "", -1)
-
-		ip := ResolveDNS(subdomain)
-		if ip != "Error" {
-			// if ip exists in hostmap do the following
-			if _, ok := hostmap[ip]; ok {
-				hostmap[ip] = append(hostmap[ip], subdomain)
-			} else {
-				hostmap[ip] = []string{subdomain}
-			}
-		}
-
-		progress.Add(1)
+		jobs <- subdomain
 	}
+
+	close(jobs)
+	wg.Wait()
 
 	if err := wlstream.Err(); err != nil {
 		log.Fatal(err)
