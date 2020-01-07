@@ -11,6 +11,7 @@ require (
 	github.com/schollz/progressbar/v2 v2.15.0
 	github.com/timshannon/bolthold v0.0.0-20191212204344-59576e1e7b0b
 	github.com/urfave/cli v1.22.2
+	github.com/urfave/cli/v2 v2.1.1
 	go.etcd.io/bbolt v1.3.3
 	golang.org/x/sys v0.0.0-20200102141924-c96a22e43c9c // indirect
 )

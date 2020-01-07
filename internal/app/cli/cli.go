@@ -6,7 +6,7 @@ import (
 
 	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/leobeosab/sharingan/pkg/storage"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func SetupCLI() {
@@ -45,7 +45,7 @@ func SetupCLI() {
 		},
 	}
 
-	sharingan.Commands = []cli.Command{
+	sharingan.Commands = []*cli.Command{
 		{
 			Name:  "dns",
 			Usage: "Perform a DNS scan",
