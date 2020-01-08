@@ -47,7 +47,7 @@ func RunDNSRecon(settings *models.ScanSettings) {
 	}
 
 	// Get a few lines of space before final result
-	fmt.Printf("\n\n")
+	fmt.Printf("\n")
 	// Pretty print the results
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
