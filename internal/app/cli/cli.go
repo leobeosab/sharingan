@@ -20,35 +20,12 @@ func SetupCLI() {
 	sharingan.Name = "Sharingan"
 	sharingan.Usage = "Wrapper and analyzer for offensive security recon tools"
 
-	sharingan.Flags = []cli.Flag{
-		&cli.StringFlag{
-			Name:        "dns-wordlist",
-			Value:       "",
-			Usage:       "Wordlist for DNS bruteforcing",
-			Destination: &settings.DNSWordlist,
-		},
-		&cli.StringFlag{
-			Name:        "target",
-			Value:       "",
-			Usage:       "Target domain",
-			Destination: &settings.Target,
-		},
-		&cli.BoolFlag{
-			Name:        "skip-probe",
-			Usage:       "Skips host-up nmap scan",
-			Destination: &settings.SkipProbe,
-		},
-		&cli.BoolFlag{
-			Name:        "rescan",
-			Usage:       "Scans domain regardless of the existance of previous results",
-			Destination: &settings.Rescan,
-		},
-	}
-
+	sharingan.Flags = GetGlobalFlags(settings)
 	sharingan.Commands = []*cli.Command{
 		{
 			Name:  "dns",
 			Usage: "Perform a DNS scan",
+			Flags: GetDNSFlags(settings),
 			Action: func(c *cli.Context) error {
 				RunDNSRecon(settings)
 				return nil
@@ -57,6 +34,7 @@ func SetupCLI() {
 		{
 			Name:  "scan",
 			Usage: "Perform a service scan using nmap -sV",
+			Flags: GetDNSFlags(settings),
 			Action: func(c *cli.Context) error {
 				RunNmapScan(settings)
 				return nil
