@@ -55,6 +55,7 @@ GLOBAL OPTIONS:
    --rescan              Scans domain regardless of the existance of previous results
    --help, -h            show help
    --version, -v         print the version
+
 ```
 
 ## TODO
