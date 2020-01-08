@@ -43,7 +43,6 @@ func SetupCLI() {
 	}
 
 	sharingan.Action = func(c *cli.Context) error {
-		// RunDNSRecon(settings)
 		return nil
 	}
 
