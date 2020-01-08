@@ -59,6 +59,7 @@ GLOBAL OPTIONS:
 ```
 
 ## TODO
+*   Tests -- next on the list
 *   Better progress bars
 *   JSON and regular file exports
 *   Automated scans through a daemon?
