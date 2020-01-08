@@ -9,3 +9,7 @@ type ScanSettings struct {
 	Rescan      bool
 	Store       *bolthold.Store
 }
+
+type NMapSettings struct {
+	Interactive string
+}

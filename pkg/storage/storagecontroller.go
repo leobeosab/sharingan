@@ -60,3 +60,8 @@ func RetrieveScanResults(s *bolthold.Store, d string) []models.ScanResults {
 
 	return results
 }
+
+func ScanEntryExists(s *bolthold.Store, d string) (bool, []models.ScanResults) {
+	results := RetrieveScanResults(s, d)
+	return len(results) > 0, results
+}
