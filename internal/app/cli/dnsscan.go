@@ -17,14 +17,15 @@ func RunDNSRecon(settings *models.ScanSettings) {
 		log.Fatal("Target needs to be defined")
 	}
 
-	if settings.DNSWordlist == "" {
-		log.Fatal("DNS Wordlist needs to be defined")
-	}
-
 	var s models.ScanResults
 
 	r := storage.RetrieveScanResults(settings.Store, settings.Target)
 	if len(r) == 0 || settings.Rescan {
+		// Check for DNS wordlist
+		if settings.DNSWordlist == "" {
+			log.Fatalf("No previous scan found - DNS Wordlist needs to be defined")
+		}
+
 		s = models.ScanResults{
 			RootDomain: settings.Target,
 		}
