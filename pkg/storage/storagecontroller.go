@@ -2,14 +2,29 @@ package storage
 
 import (
 	"log"
+	"os"
 
 	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/timshannon/bolthold"
 	"go.etcd.io/bbolt"
 )
 
-func OpenStore() *bolthold.Store {
-	store, err := bolthold.Open("/tmp/boldt.db", 0600, nil)
+// Checks if there is a single path in the p slice and if there is it uses that for the db file
+// Otherwise it uses a defaulting name in the users home directory
+func OpenStore(p ...string) *bolthold.Store {
+	var dbl string
+	if len(p) > 0 && p[0] != "" {
+		dbl = p[0]
+	} else {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dbl = home + "/.sharingan.bhdb"
+	}
+
+	store, err := bolthold.Open(dbl, 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
