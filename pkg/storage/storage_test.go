@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/leobeosab/sharingan/internal/models"
+	"github.com/timshannon/bolthold"
 )
 
 func TestOpenStore(t *testing.T) {
@@ -19,7 +20,58 @@ func TestOpenStore(t *testing.T) {
 func TestStoreAndRetrieve(t *testing.T) {
 	t.Logf("Testing Save & Retrieve Scan with custom db path")
 
-	expected := models.ScanResults{
+	expected := NewBasicScanResults()
+	s := CreateBasicStoreAndEntry(expected, t)
+
+	ret := RetrieveScanResults(s, expected.RootDomain)
+	actual := ret[0]
+
+	if diff := cmp.Diff(expected, actual); diff != "" {
+		t.Errorf("Compare scan results mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	t.Logf("Testing Update scan results")
+
+	expected := NewBasicScanResults()
+	s := CreateBasicStoreAndEntry(expected, t)
+
+	expected.Hosts = append(expected.Hosts,
+		models.Host{
+			IP:         "192.168.1.1",
+			Subdomains: []string{"router.asus"},
+			OpenPorts:  []int{22},
+			Http:       false,
+		},
+	)
+
+	UpdateScan(s, &expected)
+
+	ret := RetrieveScanResults(s, expected.RootDomain)
+	actual := ret[0]
+
+	if diff := cmp.Diff(expected, actual); diff != "" {
+		t.Errorf("Compare scan results mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func CreateBasicStoreAndEntry(m models.ScanResults, t *testing.T) *bolthold.Store {
+	// Create tmp file so we don't get same id errors
+	tmp, err := ioutil.TempFile(os.TempDir(), "sharingantesting-")
+	if err != nil {
+		t.Fatalf("Error creating temporary file")
+	}
+	defer os.Remove(tmp.Name())
+
+	s := OpenStore(tmp.Name())
+	SaveScan(s, &m)
+
+	return s
+}
+
+func NewBasicScanResults() models.ScanResults {
+	return models.ScanResults{
 		RootDomain: "bestdomain.com",
 		Hosts: []models.Host{
 			models.Host{
@@ -30,22 +82,5 @@ func TestStoreAndRetrieve(t *testing.T) {
 			},
 		},
 		DateLastScanned: time.Now(),
-	}
-
-	// Create tmp file so we don't get same id errors
-	tmp, err := ioutil.TempFile(os.TempDir(), "sharingantesting-")
-	if err != nil {
-		t.Fatalf("Error creating temporary file")
-	}
-	defer os.Remove(tmp.Name())
-
-	s := OpenStore(tmp.Name())
-	SaveScan(s, &expected)
-
-	ret := RetrieveScanResults(s, expected.RootDomain)
-	actual := ret[0]
-
-	if diff := cmp.Diff(expected, actual); diff != "" {
-		t.Errorf("Compare scan results mismatch (-want +got):\n%s", diff)
 	}
 }
