@@ -1,7 +1,7 @@
 # Sharingan
 
 <p align="center">
-	<img src="./itachi.jpg" width="80%" >
+	<img src="./icon.jpg" width="35%" >
 </p>
 
 Sharingan is a recon multitool for offensive security / bug bounty
