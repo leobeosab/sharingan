@@ -25,7 +25,7 @@ func SetupCLI() {
 	sharingan.Commands = []*cli.Command{
 		{
 			Name:  "dns",
-			Usage: "Perform a DNS scan : sharingancli --target target.com dns --dns-wordlist ./path/to/list",
+			Usage: "Perform a DNS scan : sharingancli --target ProgramName dns --rootdomain rootdomain.com --dns-wordlist ./path/to/list",
 			Flags: GetDNSFlags(settings),
 			Action: func(c *cli.Context) error {
 				RunDNSRecon(settings)
@@ -34,7 +34,7 @@ func SetupCLI() {
 		},
 		{
 			Name:  "scan",
-			Usage: "Perform a service scan using nmap -sV : sharingancli --target target.com scan",
+			Usage: "Perform a service scan using nmap -sV : sharingancli --target ProgramName scan",
 			Flags: GetDNSFlags(settings),
 			Action: func(c *cli.Context) error {
 				RunNmapScan(settings)

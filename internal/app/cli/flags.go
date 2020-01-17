@@ -28,6 +28,12 @@ func GetDNSFlags(s *models.ScanSettings) []cli.Flag {
 			Usage:       "Wordlist for DNS bruteforcing",
 			Destination: &s.DNSWordlist,
 		},
+		&cli.StringFlag{
+			Name:        "root-domain",
+			Value:       "",
+			Usage:       "Basis for subdomain scanning",
+			Destination: &s.RootDomain,
+		},
 		&cli.BoolFlag{
 			Name:        "skip-probe",
 			Usage:       "Skips host-up nmap scan",

@@ -2,8 +2,10 @@ package models
 
 import "time"
 
-type ScanResults struct {
-	RootDomain      string
+// Bug bounty program
+
+type Program struct {
+	ProgramName     string
 	Hosts           []Host
 	DateLastScanned time.Time
 }

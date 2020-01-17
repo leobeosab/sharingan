@@ -16,7 +16,7 @@ import (
 	"github.com/schollz/progressbar/v2"
 )
 
-func DNSBruteForce(target string, wordlistPath string) []models.Host {
+func DNSBruteForce(rd string, wordlistPath string) []models.Host {
 	// Read the DNS names from wordlist
 	wordlist, err := os.Open(wordlistPath)
 	if err != nil {
@@ -63,8 +63,9 @@ func DNSBruteForce(target string, wordlistPath string) []models.Host {
 
 	// Stream wordlist to resolve DNS
 	wlstream := bufio.NewScanner(wordlist)
+	jobs <- rd
 	for wlstream.Scan() {
-		subdomain := wlstream.Text() + "." + target
+		subdomain := wlstream.Text() + "." + rd
 		subdomain = strings.Replace(subdomain, " ", "", -1)
 		jobs <- subdomain
 	}
