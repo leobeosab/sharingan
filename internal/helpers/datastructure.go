@@ -9,3 +9,19 @@ func GetKeysFromMap(m *map[string]string) []string {
 
 	return s
 }
+
+func RemoveDuplicatesInSlice(slice []string) []string {
+
+	check := make(map[string]int)
+	res := make([]string, 0)
+
+	for _, val := range slice {
+		check[val] = 0
+	}
+
+	for s, _ := range check {
+		res = append(res, s)
+	}
+
+	return res
+}

@@ -13,7 +13,7 @@ import (
 func RunNmapScan(s *models.ScanSettings) {
 
 	// This feels gross, find a good way to return a single entry with bolthold
-	exists, results := storage.ScanEntryExists(s.Store, s.Target)
+	exists, results := storage.ProgramEntryExists(s.Store, s.Target)
 
 	if exists {
 		result := results[0]

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -26,16 +27,35 @@ func SetupCLI() {
 		{
 			Name:  "dns",
 			Usage: "Perform a DNS scan : sharingancli --target ProgramName dns --rootdomain rootdomain.com --dns-wordlist ./path/to/list",
-			Flags: GetDNSFlags(settings),
 			Action: func(c *cli.Context) error {
-				RunDNSRecon(settings)
+				fmt.Println("Must use bruteforce or addsubs command")
 				return nil
+			},
+			Subcommands: []*cli.Command{
+				{
+					Name:  "bruteforce",
+					Usage: "Brute force subdomains for a given rootdomain",
+					Flags: GetDNSFlags(settings),
+					Action: func(c *cli.Context) error {
+						RunDNSRecon(settings)
+						return nil
+					},
+				},
+				{
+					Name:  "addsubs",
+					Usage: "Add subdomains to a given program using stdin ie : cat subs | sharingancli --target example DNS addsubs",
+					Flags: GetDNSFlags(settings),
+					Action: func(c *cli.Context) error {
+						AddSubsToProgram(settings)
+						return nil
+					},
+				},
 			},
 		},
 		{
 			Name:  "scan",
 			Usage: "Perform a service scan using nmap -sV : sharingancli --target ProgramName scan",
-			Flags: GetDNSFlags(settings),
+			Flags: GetNMapFlags(settings),
 			Action: func(c *cli.Context) error {
 				RunNmapScan(settings)
 				return nil

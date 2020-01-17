@@ -16,7 +16,8 @@ import (
 	"github.com/schollz/progressbar/v2"
 )
 
-func DNSBruteForce(rd string, wordlistPath string) []models.Host {
+// TODO: fucking refactor this shit
+func DNSBruteForce(rd string, wordlistPath string) ([]models.Host, []string) {
 	// Read the DNS names from wordlist
 	wordlist, err := os.Open(wordlistPath)
 	if err != nil {
@@ -35,6 +36,7 @@ func DNSBruteForce(rd string, wordlistPath string) []models.Host {
 
 	mux := &sync.Mutex{}
 	jobs := make(chan string)
+	subdomains := make([]string, 0)
 	var wg sync.WaitGroup
 
 	for i := 0; i < 20; i++ {
@@ -47,6 +49,7 @@ func DNSBruteForce(rd string, wordlistPath string) []models.Host {
 				ip := ResolveDNS(domain)
 				if ip != "Error" {
 					mux.Lock()
+					subdomains = append(subdomains, domain)
 					// if ip exists in hostmap do the following
 					if _, ok := hostmap[ip]; ok {
 						hostmap[ip] = append(hostmap[ip], domain)
@@ -77,7 +80,7 @@ func DNSBruteForce(rd string, wordlistPath string) []models.Host {
 		log.Fatal(err)
 	}
 
-	return HostmapToHostSlice(hostmap)
+	return HostmapToHostSlice(hostmap), subdomains
 }
 
 // map[host][]subdomains

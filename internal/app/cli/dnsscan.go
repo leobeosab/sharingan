@@ -1,11 +1,13 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"text/tabwriter"
 
+	"github.com/leobeosab/sharingan/internal/helpers"
 	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/leobeosab/sharingan/pkg/dns"
 	"github.com/leobeosab/sharingan/pkg/nmap"
@@ -30,14 +32,15 @@ func RunDNSRecon(settings *models.ScanSettings) {
 			ProgramName: settings.Target,
 		}
 
-		p.Hosts = dns.DNSBruteForce(settings.RootDomain, settings.DNSWordlist)
+		// We will need a way to update this instead of just overwriting it
+		p.Hosts, p.Subdomains = dns.DNSBruteForce(settings.RootDomain, settings.DNSWordlist)
 
 		if !settings.SkipProbe {
 			nmap.FilterHosts(&p.Hosts)
 		}
 
 		if settings.Rescan {
-			storage.UpdateScan(settings.Store, &p)
+			storage.UpdateProgram(settings.Store, &p)
 		} else {
 			storage.SaveProgram(settings.Store, &p)
 		}
@@ -59,4 +62,44 @@ func RunDNSRecon(settings *models.ScanSettings) {
 	}
 
 	w.Flush()
+}
+
+func AddSubsToProgram(settings *models.ScanSettings) {
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		panic(err)
+	}
+
+	var p models.Program
+	r := storage.RetrieveProgram(settings.Store, settings.Target)
+	if len(r) == 0 {
+		fmt.Println(settings.Target + " not found in store, creating new entry")
+		p = models.Program{
+			ProgramName: settings.Target,
+			Hosts:       []models.Host{},
+		}
+	} else {
+		p = r[0]
+	}
+
+	if info.Mode()&os.ModeNamedPipe == 0 {
+		fmt.Println("DNS addsubs is intended to work with pipies.")
+		fmt.Println("Usage: cat subs | sharingancli --target program dns addsubs")
+		return
+	}
+
+	reader := bufio.NewScanner(os.Stdin)
+	var subdomains []string
+
+	for reader.Scan() {
+		input := reader.Text()
+		subdomains = append(subdomains, input)
+	}
+
+	p.Subdomains = append(p.Subdomains, subdomains...)
+	p.Subdomains = helpers.RemoveDuplicatesInSlice(p.Subdomains)
+
+	storage.UpdateOrCreateProgram(settings.Store, &p)
+
+	fmt.Printf("Added %v subdomains to %s \n", len(subdomains), settings.Target)
 }
