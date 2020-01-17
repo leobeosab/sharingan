@@ -61,6 +61,20 @@ func SetupCLI() {
 				return nil
 			},
 		},
+		{
+			Name:  "info",
+			Usage: "Gets information contained in a program/scan",
+			Subcommands: []*cli.Command{
+				{
+					Name:  "domains",
+					Usage: "Prints subdomains for program/scan on stdout",
+					Action: func(c *cli.Context) error {
+						PrintDomains(settings)
+						return nil
+					},
+				},
+			},
+		},
 	}
 
 	sharingan.Action = func(c *cli.Context) error {
