@@ -61,7 +61,7 @@ func SetupCLI() {
 					Name:  "interactive",
 					Usage: "Manually select hosts from program to scan",
 					Action: func(c *cli.Context) error {
-						RunNmapScan(settings)
+						RunNmapScanInteractive(settings)
 						return nil
 					},
 				},

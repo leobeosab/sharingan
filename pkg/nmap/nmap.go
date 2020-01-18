@@ -2,7 +2,6 @@ package nmap
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 )
 
 func FilterHosts(targets *[]models.Host) {
-	fmt.Printf("\n\nChecking if hosts are up...")
+	log.Printf("\n\nChecking if hosts are up...")
 
 	targetSlice := make([]string, len(*targets))
 	// makes deletion trivial
@@ -83,6 +82,9 @@ func Scan(target string) []models.Port {
 
 	ports := make([]models.Port, 0)
 
+	if len(result.Hosts) == 0 {
+		return ports
+	}
 	// No support for multiple hosts at once yet
 	for _, np := range result.Hosts[0].Ports {
 		p := models.Port{

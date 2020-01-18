@@ -17,7 +17,7 @@ func RunNmapScan(s *models.ScanSettings) {
 
 	if exists {
 		p := results[0]
-		log.Printf("Starting Nmap scan of %v domains... this may take some time", len(p.Hosts))
+		log.Printf("Starting Nmap scan of %v hosts... this may take some time\n", len(p.Hosts))
 
 		hosts := make(chan models.Host, len(p.Hosts))
 		results := make(chan models.Host, len(p.Hosts))
@@ -32,7 +32,7 @@ func RunNmapScan(s *models.ScanSettings) {
 			result, err := prompt.Run()
 
 			if err != nil {
-				log.Printf("Prompt faield %v\n", err)
+				log.Printf("Prompt failed %v\n", err)
 				return
 			}
 
