@@ -57,9 +57,12 @@ GLOBAL OPTIONS:
    --version, -v         print the version
 
 ```
+## TODO in shor term
+*   Nmap interactive port storage
+*   add a way to do SYN / -sS scanning [ must be root so it presents a challenge ]
+*   Addsubs command needs to do name server look ups and add to hosts
 
-## TODO
-*   Tests -- next on the list
+## Roadmap? 
 *   Better progress bars
 *   JSON and regular file exports
 *   Automated scans through a daemon?
