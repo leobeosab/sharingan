@@ -96,10 +96,17 @@ func AddSubsToProgram(settings *models.ScanSettings) {
 		subdomains = append(subdomains, input)
 	}
 
-	p.Subdomains = append(p.Subdomains, subdomains...)
+	cliOut := fmt.Sprintf("Added %v subdomains to %s \n", len(subdomains), settings.Target)
+
+	if !settings.ReplaceSubs {
+		p.Subdomains = subdomains
+	} else {
+		p.Subdomains = append(p.Subdomains, subdomains...)
+		cliOut = fmt.Sprintf("Replacing subdomains for %s \n", settings.Target)
+	}
 	p.Subdomains = helpers.RemoveDuplicatesInSlice(p.Subdomains)
 
 	storage.UpdateOrCreateProgram(settings.Store, &p)
 
-	fmt.Printf("Added %v subdomains to %s \n", len(subdomains), settings.Target)
+	fmt.Printf(cliOut)
 }

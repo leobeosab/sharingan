@@ -8,6 +8,7 @@ type ScanSettings struct {
 	Target      string
 	SkipProbe   bool
 	Rescan      bool
+	ReplaceSubs bool
 	Store       *bolthold.Store
 }
 

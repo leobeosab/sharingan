@@ -40,6 +40,11 @@ func GetDNSFlags(s *models.ScanSettings) []cli.Flag {
 			Destination: &s.SkipProbe,
 		},
 		&cli.BoolFlag{
+			Name:        "replace-subs",
+			Usage:       "used with add subs to replace all subs for program",
+			Destination: &s.ReplaceSubs,
+		},
+		&cli.BoolFlag{
 			Name:        "rescan",
 			Usage:       "Scans domain regardless of the existance of previous results",
 			Destination: &s.Rescan,
