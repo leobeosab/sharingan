@@ -6,6 +6,7 @@ type ScanSettings struct {
 	DNSWordlist string
 	RootDomain  string
 	Target      string
+	Threads     int
 	SkipProbe   bool
 	Rescan      bool
 	ReplaceSubs bool

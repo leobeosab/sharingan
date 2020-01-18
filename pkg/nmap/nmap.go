@@ -56,7 +56,7 @@ func FilterHosts(targets *[]models.Host) {
 	*targets = filtered
 }
 
-func Scan(target string) {
+func Scan(target string) []models.Port {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
@@ -75,18 +75,18 @@ func Scan(target string) {
 		log.Fatalf("Unable to run nmap scan: %v", err)
 	}
 
-	// Use the results to print an example output
-	for _, host := range result.Hosts {
-		if len(host.Ports) == 0 || len(host.Addresses) == 0 {
-			continue
+	ports := make([]models.Port, 0)
+
+	// No support for multiple hosts at once yet
+	for _, np := range result.Hosts[0].Ports {
+		p := models.Port{
+			ID:          np.ID,
+			Protocol:    np.Protocol,
+			ServiceName: np.Service.Name,
 		}
 
-		fmt.Printf("Host %q:\n", host.Addresses[0])
-
-		for _, port := range host.Ports {
-			fmt.Printf("\tPort %d/%s %s %s\n", port.ID, port.Protocol, port.State, port.Service.Name)
-		}
+		ports = append(ports, p)
 	}
 
-	fmt.Printf("Nmap done: %d hosts up scanned in %3f seconds\n", len(result.Hosts), result.Stats.Finished.Elapsed)
+	return ports
 }

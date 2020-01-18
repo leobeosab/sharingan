@@ -46,14 +46,14 @@ func RunDNSRecon(settings *models.ScanSettings) {
 		}
 	} else {
 		p = r[0]
-		fmt.Println("Found previous scan")
+		log.Println("Found previous scan")
 	}
 
 	// Get a few lines of space before final result
-	fmt.Printf("\n")
+	log.Printf("\n")
 	// Pretty print the results
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
+	w.Init(os.Stderr, 8, 8, 0, '\t', 0)
 
 	fmt.Fprintf(w, "\n%s\t%s\t", "Host Address ", "| Subdomain List")
 	fmt.Fprintf(w, "\n%s\t%s\t", "----------------- ", "| -------")
@@ -83,8 +83,8 @@ func AddSubsToProgram(settings *models.ScanSettings) {
 	}
 
 	if info.Mode()&os.ModeNamedPipe == 0 {
-		fmt.Println("DNS addsubs is intended to work with pipies.")
-		fmt.Println("Usage: cat subs | sharingancli --target program dns addsubs")
+		log.Println("DNS addsubs is intended to work with pipies.")
+		log.Println("Usage: cat subs | sharingancli --target program dns addsubs")
 		return
 	}
 
@@ -108,5 +108,5 @@ func AddSubsToProgram(settings *models.ScanSettings) {
 
 	storage.UpdateOrCreateProgram(settings.Store, &p)
 
-	fmt.Printf(cliOut)
+	log.Printf(cliOut)
 }

@@ -56,6 +56,16 @@ func SetupCLI() {
 			Name:  "scan",
 			Usage: "Perform a service scan using nmap -sV : sharingancli --target ProgramName scan",
 			Flags: GetNMapFlags(settings),
+			Subcommands: []*cli.Command{
+				{
+					Name:  "interactive",
+					Usage: "Manually select hosts from program to scan",
+					Action: func(c *cli.Context) error {
+						RunNmapScan(settings)
+						return nil
+					},
+				},
+			},
 			Action: func(c *cli.Context) error {
 				RunNmapScan(settings)
 				return nil

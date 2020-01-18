@@ -2,7 +2,9 @@ package cli
 
 import (
 	"fmt"
+	"log"
 	"strings"
+	"sync"
 
 	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/leobeosab/sharingan/pkg/nmap"
@@ -11,6 +13,54 @@ import (
 )
 
 func RunNmapScan(s *models.ScanSettings) {
+	exists, results := storage.ProgramEntryExists(s.Store, s.Target)
+
+	if exists {
+		p := results[0]
+		log.Printf("Starting Nmap scan of %v domains... this may take some time", len(p.Hosts))
+
+		hosts := make(chan models.Host, len(p.Hosts))
+		results := make(chan models.Host, len(p.Hosts))
+		var wg sync.WaitGroup
+
+		for t := 0; t < s.Threads; t++ {
+			wg.Add(1)
+
+			go func() {
+				defer wg.Done()
+
+				for h := range hosts {
+					h.Ports = nmap.Scan(h.IP)
+					log.Printf("\n%v : %v\n", h.IP, h.Ports)
+					results <- h
+				}
+			}()
+		}
+
+		for _, h := range p.Hosts {
+			hosts <- h
+		}
+
+		close(hosts)
+		wg.Wait()
+		close(results)
+
+		slice := make([]models.Host, 0)
+		for h := range results {
+			slice = append(slice, h)
+		}
+
+		p.Hosts = slice
+
+		storage.UpdateProgram(s.Store, &p)
+
+	} else {
+		log.Printf("Error: no program called %s found \n", s.Target)
+	}
+
+}
+
+func RunNmapScanInteractive(s *models.ScanSettings) {
 
 	// This feels gross, find a good way to return a single entry with bolthold
 	exists, results := storage.ProgramEntryExists(s.Store, s.Target)

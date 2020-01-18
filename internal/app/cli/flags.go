@@ -13,6 +13,12 @@ func GetGlobalFlags(s *models.ScanSettings) []cli.Flag {
 			Usage:       "Target domain",
 			Destination: &s.Target,
 		},
+		&cli.IntFlag{
+			Name:        "threads",
+			Value:       20,
+			Usage:       "Max number of go routines",
+			Destination: &s.Threads,
+		},
 	}
 }
 
