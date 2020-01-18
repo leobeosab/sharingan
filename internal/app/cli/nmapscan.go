@@ -23,6 +23,25 @@ func RunNmapScan(s *models.ScanSettings) {
 		results := make(chan models.Host, len(p.Hosts))
 		var wg sync.WaitGroup
 
+		if len(p.Hosts) > 10 && !s.NoPrompt {
+			prompt := promptui.Prompt{
+				Label:     "Warning port scans can be loud and you are scanning with > 10 hosts. Do you want to continue?",
+				IsConfirm: true,
+			}
+
+			result, err := prompt.Run()
+
+			if err != nil {
+				log.Printf("Prompt faield %v\n", err)
+				return
+			}
+
+			if result != "y" {
+				log.Printf("Exiting... \n")
+				return
+			}
+		}
+
 		for t := 0; t < s.Threads; t++ {
 			wg.Add(1)
 

@@ -9,6 +9,7 @@ type ScanSettings struct {
 	Threads     int
 	SkipProbe   bool
 	Rescan      bool
+	NoPrompt    bool
 	ReplaceSubs bool
 	Store       *bolthold.Store
 }

@@ -73,6 +73,12 @@ func Scan(target string) []models.Port {
 	result, _, err := scanner.Run()
 	if err != nil {
 		log.Fatalf("Unable to run nmap scan: %v", err)
+
+		if len(result.NmapErrors) > 0 {
+			for e := range result.NmapErrors {
+				log.Println(e)
+			}
+		}
 	}
 
 	ports := make([]models.Port, 0)

@@ -19,6 +19,12 @@ func GetGlobalFlags(s *models.ScanSettings) []cli.Flag {
 			Usage:       "Max number of go routines",
 			Destination: &s.Threads,
 		},
+		&cli.BoolFlag{
+			Name:        "no-prompt",
+			Value:       false,
+			Usage:       "Disable prompts and continue without confirmation",
+			Destination: &s.NoPrompt,
+		},
 	}
 }
 
