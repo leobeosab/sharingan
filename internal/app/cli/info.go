@@ -15,7 +15,7 @@ func PrintDomains(settings *models.ScanSettings) {
 	}
 	p := r[0]
 
-	for _, s := range p.Subdomains {
+	for s, _ := range p.Hosts {
 		fmt.Println(s)
 	}
 }

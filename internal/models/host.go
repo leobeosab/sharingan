@@ -1,8 +1,8 @@
 package models
 
+// Shouldn't rely on IP can change based on load balancers and plenty of other variables
 type Host struct {
-	IP          string
-	Subdomains  []string
+	Subdomain   string
 	Ports       []Port
 	Http, Https bool
 }

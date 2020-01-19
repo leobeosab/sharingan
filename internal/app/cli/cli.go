@@ -46,7 +46,7 @@ func SetupCLI() {
 					Usage: "Add subdomains to a given program using stdin ie : cat subs | sharingancli --target example DNS addsubs",
 					Flags: GetDNSFlags(settings),
 					Action: func(c *cli.Context) error {
-						AddSubsToProgram(settings)
+						AddSubsFromInput(settings)
 						return nil
 					},
 				},

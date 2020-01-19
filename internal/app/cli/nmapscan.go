@@ -42,6 +42,8 @@ func RunNmapScan(s *models.ScanSettings) {
 			}
 		}
 
+		// This can be optimized to check if it has already scanned the same host...
+		// under a different subdomain
 		for t := 0; t < s.Threads; t++ {
 			wg.Add(1)
 
@@ -49,8 +51,8 @@ func RunNmapScan(s *models.ScanSettings) {
 				defer wg.Done()
 
 				for h := range hosts {
-					h.Ports = nmap.Scan(h.IP)
-					log.Printf("\n%v : %v\n", h.IP, h.Ports)
+					h.Ports = nmap.Scan(h.Subdomain)
+					log.Printf("\n%v : %v\n", h.Subdomain, h.Ports)
 					results <- h
 				}
 			}()
@@ -64,12 +66,9 @@ func RunNmapScan(s *models.ScanSettings) {
 		wg.Wait()
 		close(results)
 
-		slice := make([]models.Host, 0)
 		for h := range results {
-			slice = append(slice, h)
+			p.Hosts[h.Subdomain] = h
 		}
-
-		p.Hosts = slice
 
 		storage.UpdateProgram(s.Store, &p)
 
@@ -89,7 +88,7 @@ func RunNmapScanInteractive(s *models.ScanSettings) {
 		options := make([]string, 0)
 
 		for _, h := range result.Hosts {
-			option := h.IP + " - [" + strings.Join(h.Subdomains, ",") + "]"
+			option := h.Subdomain
 			options = append(options, option)
 		}
 
