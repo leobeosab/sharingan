@@ -36,7 +36,7 @@ Adds subdomains to the program's storage from stdin using pipes
 ### Scan
 Scans all hosts available that were stored in target using nmap
 `sharingancli --target target scan`
-![scan_example_gif](./scan_example_gif)
+![scan_example_gif](./scan_example.gif)
 
 ###### interactive
 Scan a single host from list of subdomains stored in target 
