@@ -20,7 +20,7 @@ func SetupCLI() {
 	sharingan := cli.NewApp()
 	sharingan.Name = "Sharingan"
 	sharingan.Usage = "Wrapper and analyzer for offensive security recon tools"
-	sharingan.Version = "0.1.0"
+	sharingan.Version = "0.2.0"
 
 	sharingan.Flags = GetGlobalFlags(settings)
 	sharingan.Commands = []*cli.Command{
