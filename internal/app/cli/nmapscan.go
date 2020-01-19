@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/leobeosab/sharingan/internal/helpers"
 	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/leobeosab/sharingan/pkg/nmap"
 	"github.com/leobeosab/sharingan/pkg/storage"
@@ -52,7 +53,7 @@ func RunNmapScan(s *models.ScanSettings) {
 
 				for h := range hosts {
 					h.Ports = nmap.Scan(h.Subdomain)
-					log.Printf("\n%v : %v\n", h.Subdomain, h.Ports)
+					helpers.PrintNmapScan(h)
 					results <- h
 				}
 			}()
@@ -79,8 +80,6 @@ func RunNmapScan(s *models.ScanSettings) {
 }
 
 func RunNmapScanInteractive(s *models.ScanSettings) {
-
-	// This feels gross, find a good way to return a single entry with bolthold
 	exists, results := storage.ProgramEntryExists(s.Store, s.Target)
 
 	if exists {
@@ -100,31 +99,27 @@ func RunNmapScanInteractive(s *models.ScanSettings) {
 		_, selection, err := prompt.Run()
 
 		if err != nil {
-			fmt.Println("Error based on input")
+			log.Printf("Prompt error\n")
+			return
 		}
 
 		d := strings.Split(selection, " - ")[0]
-		fmt.Printf("Scanning %s with nmap...\n\n", d)
-		nmap.Scan(d)
+		log.Printf("Scanning %s with nmap...\n\n", d)
+		ports := nmap.Scan(d)
 
+		if len(ports) == 0 {
+			log.Printf("No ports open \n")
+			return
+		}
+
+		host := result.Hosts[d]
+		host.Ports = ports
+		result.Hosts[d] = host
+
+		helpers.PrintNmapScan(host)
+
+		storage.UpdateProgram(s.Store, &result)
 	} else {
 		fmt.Printf("No scans found for %s", s.Target)
-
-		prompt := promptui.Prompt{
-			Label:     "Do you want to run the scan on: " + s.Target,
-			IsConfirm: true,
-		}
-
-		result, err := prompt.Run()
-
-		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-		}
-
-		if result == "y" {
-			nmap.Scan(s.Target)
-		} else {
-			fmt.Println("You got it champ, see ya")
-		}
 	}
 }

@@ -45,6 +45,7 @@ func Scan(target string) []models.Port {
 			ID:          np.ID,
 			Protocol:    np.Protocol,
 			ServiceName: np.Service.Name,
+			State:       np.State.String(),
 		}
 
 		ports = append(ports, p)
