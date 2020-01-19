@@ -24,29 +24,39 @@ Outside of your gopath
 Order matters when it comes to flags it must be `sharingancli [globalflags] command [commandflags]` if this isn't a wanted feature I can change it but I like how clean it is
 
 ### DNS
-###### bruteforce
+#### bruteforce
 DNS busts the target with a wordlist you provide 
-`sharingancli --target targetname dns --dns-wordlist ~/path/to/wordlist --root-domain target.com`
+```
+sharingancli --target targetname dns --dns-wordlist ~/path/to/wordlist --root-domain target.com
+```
 ![dns example gif](./dns_example.gif)
 
-###### addsubs
+#### addsubs
 Adds subdomains to the program's storage from stdin using pipes
-`cat subs | sharingancli --target targetname dns addsubs`
+```
+cat subs | sharingancli --target targetname dns addsubs
+```
 
 ### Scan
 Scans all hosts available that were stored in target using nmap
-`sharingancli --target target scan`
+```
+sharingancli --target target scan
+```
 ![scan_example_gif](./scan_example.gif)
 
-###### interactive
+#### interactive
 Scan a single host from list of subdomains stored in target 
-`sharingancli --target target scan interactive`
+```
+sharingancli --target target scan interactive
+```
 ![scan interactive_example gif](./scan_interactive_example.gif)
 
 ### info
-###### domains
+#### domains
 Outputs all domains as a list in stdout
-`sharingancli --target target info domains`
+```
+sharingancli --target target info domains
+```
 ![info example](./info_example.png)
 
 ## TODO in shor term
