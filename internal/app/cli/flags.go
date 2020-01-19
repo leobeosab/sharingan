@@ -13,6 +13,18 @@ func GetGlobalFlags(s *models.ScanSettings) []cli.Flag {
 			Usage:       "Target domain",
 			Destination: &s.Target,
 		},
+		&cli.IntFlag{
+			Name:        "threads",
+			Value:       20,
+			Usage:       "Max number of go routines",
+			Destination: &s.Threads,
+		},
+		&cli.BoolFlag{
+			Name:        "no-prompt",
+			Value:       false,
+			Usage:       "Disable prompts and continue without confirmation",
+			Destination: &s.NoPrompt,
+		},
 	}
 }
 
@@ -28,10 +40,21 @@ func GetDNSFlags(s *models.ScanSettings) []cli.Flag {
 			Usage:       "Wordlist for DNS bruteforcing",
 			Destination: &s.DNSWordlist,
 		},
+		&cli.StringFlag{
+			Name:        "root-domain",
+			Value:       "",
+			Usage:       "Basis for subdomain scanning",
+			Destination: &s.RootDomain,
+		},
 		&cli.BoolFlag{
 			Name:        "skip-probe",
 			Usage:       "Skips host-up nmap scan",
 			Destination: &s.SkipProbe,
+		},
+		&cli.BoolFlag{
+			Name:        "replace-subs",
+			Usage:       "used with add subs to replace all subs for program",
+			Destination: &s.ReplaceSubs,
 		},
 		&cli.BoolFlag{
 			Name:        "rescan",

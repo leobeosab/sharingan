@@ -32,9 +32,9 @@ func OpenStore(p ...string) *bolthold.Store {
 	return store
 }
 
-func SaveScan(s *bolthold.Store, scan *models.ScanResults) {
+func SaveProgram(s *bolthold.Store, p *models.Program) {
 	err := s.Bolt().Update(func(tx *bbolt.Tx) error {
-		err := s.TxInsert(tx, scan.RootDomain, *scan)
+		err := s.TxInsert(tx, p.ProgramName, *p)
 		if err != nil {
 			return err
 		}
@@ -47,9 +47,9 @@ func SaveScan(s *bolthold.Store, scan *models.ScanResults) {
 	}
 }
 
-func UpdateScan(s *bolthold.Store, scan *models.ScanResults) {
+func UpdateProgram(s *bolthold.Store, p *models.Program) {
 	err := s.Bolt().Update(func(tx *bbolt.Tx) error {
-		err := s.TxUpdate(tx, scan.RootDomain, *scan)
+		err := s.TxUpdate(tx, p.ProgramName, *p)
 		if err != nil {
 			return err
 		}
@@ -59,24 +59,33 @@ func UpdateScan(s *bolthold.Store, scan *models.ScanResults) {
 
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func UpdateOrCreateProgram(s *bolthold.Store, p *models.Program) {
+	e, _ := ProgramEntryExists(s, p.ProgramName)
+	if e {
+		UpdateProgram(s, p)
+	} else {
+		SaveProgram(s, p)
 	}
 }
 
 // Bolthold Store reference and rootdomain string
-func RetrieveScanResults(s *bolthold.Store, d string) []models.ScanResults {
-	var results []models.ScanResults
+func RetrieveProgram(s *bolthold.Store, p string) []models.Program {
+	var results []models.Program
 
-	err := s.Find(&results, bolthold.Where("RootDomain").Eq(d))
+	err := s.Find(&results, bolthold.Where("ProgramName").Eq(p))
 
 	if err != nil {
 		log.Println("No previous scan found")
-		results = []models.ScanResults{models.ScanResults{}}
+		results = []models.Program{models.Program{}}
 	}
 
 	return results
 }
 
-func ScanEntryExists(s *bolthold.Store, d string) (bool, []models.ScanResults) {
-	results := RetrieveScanResults(s, d)
+func ProgramEntryExists(s *bolthold.Store, p string) (bool, []models.Program) {
+	results := RetrieveProgram(s, p)
 	return len(results) > 0, results
 }

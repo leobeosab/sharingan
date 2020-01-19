@@ -3,7 +3,6 @@ package dns
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -12,11 +11,10 @@ import (
 	"time"
 
 	"github.com/leobeosab/sharingan/internal/helpers"
-	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/schollz/progressbar/v2"
 )
 
-func DNSBruteForce(target string, wordlistPath string) []models.Host {
+func DNSBruteForce(rd string, wordlistPath string, threads int) []string {
 	// Read the DNS names from wordlist
 	wordlist, err := os.Open(wordlistPath)
 	if err != nil {
@@ -25,19 +23,16 @@ func DNSBruteForce(target string, wordlistPath string) []models.Host {
 	defer wordlist.Close()
 
 	// Output information to the users
-	fmt.Printf("\n\nBeginnning DNS Brute Force\n")
+	log.Printf("Beginnning DNS Brute Force\n")
 	// Progress bar :: Needs refactoring
 	lines := helpers.GetNumberOfLinesInFile(wordlist)
 	progress := progressbar.NewOptions(lines, progressbar.OptionSetPredictTime(false))
 
-	// map[host][]subdomains
-	var hostmap = make(map[string][]string)
-
-	mux := &sync.Mutex{}
-	jobs := make(chan string)
+	jobs := make(chan string, lines)
+	subdomains := make(chan string, lines)
 	var wg sync.WaitGroup
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < threads; i++ {
 		wg.Add(1)
 
 		go func() {
@@ -46,14 +41,7 @@ func DNSBruteForce(target string, wordlistPath string) []models.Host {
 			for domain := range jobs {
 				ip := ResolveDNS(domain)
 				if ip != "Error" {
-					mux.Lock()
-					// if ip exists in hostmap do the following
-					if _, ok := hostmap[ip]; ok {
-						hostmap[ip] = append(hostmap[ip], domain)
-					} else {
-						hostmap[ip] = []string{domain}
-					}
-					mux.Unlock()
+					subdomains <- domain
 				}
 
 				progress.Add(1)
@@ -61,38 +49,31 @@ func DNSBruteForce(target string, wordlistPath string) []models.Host {
 		}()
 	}
 
-	// Stream wordlist to resolve DNS
+	// Add possible subdomains to jobs list
 	wlstream := bufio.NewScanner(wordlist)
+	jobs <- rd
 	for wlstream.Scan() {
-		subdomain := wlstream.Text() + "." + target
+		subdomain := wlstream.Text() + "." + rd
 		subdomain = strings.Replace(subdomain, " ", "", -1)
 		jobs <- subdomain
 	}
-
-	close(jobs)
-	wg.Wait()
 
 	if err := wlstream.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	return HostmapToHostSlice(hostmap)
-}
+	close(jobs)
+	wg.Wait()
+	close(subdomains)
 
-// map[host][]subdomains
-func HostmapToHostSlice(m map[string][]string) []models.Host {
-	s := make([]models.Host, 0)
-
-	for k, v := range m {
-		h := &models.Host{
-			IP:         k,
-			Subdomains: v,
-		}
-
-		s = append(s, *h)
+	// Get all subdomains into a slice and remove dupes
+	ss := make([]string, 0)
+	for s := range subdomains {
+		ss = append(ss, s)
 	}
+	ss = helpers.RemoveDuplicatesInSlice(ss)
 
-	return s
+	return ss
 }
 
 // We only return the first ip because we aren't interested in redundant servers (ie AWS ELB instances

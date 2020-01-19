@@ -24,46 +24,38 @@ Outside of your gopath
 Order matters when it comes to flags it must be `sharingancli [globalflags] command [commandflags]` if this isn't a wanted feature I can change it but I like how clean it is
 
 ### DNS
+###### bruteforce
 DNS busts the target with a wordlist you provide 
-`sharingancli --target target.com --dns-wordlist /path/to/wordlist/ dns`
+`sharingancli --target targetname dns --dns-wordlist ~/path/to/wordlist --root-domain target.com`
 ![dns example gif](./dns_example.gif)
 
-### NMap Scan
-Brings up a list of hosts found in previous dns scan if no hosts are found it asks if you want to run it on the target itself
-`sharingancli --target target.com scan`
-![dns example gif](./scan_example.gif)
+###### addsubs
+Adds subdomains to the program's storage from stdin using pipes
+`cat subs | sharingancli --target targetname dns addsubs`
 
-## Help
-```
-▶ sharingancli --help
-NAME:
-   Sharingan - Wrapper and analyzer for offensive security recon tools
+### Scan
+Scans all hosts available that were stored in target using nmap
+`sharingancli --target target scan`
+![scan_example_gif](./scan_example.gif)
 
-USAGE:
-   sharingancli [global options] command [command options] [arguments...]
+###### interactive
+Scan a single host from list of subdomains stored in target 
+`sharingancli --target target scan interactive`
+![scan interactive_example gif](./scan_interactive_example.gif)
 
-VERSION:
-   0.0.0
+### info
+###### domains
+Outputs all domains as a list in stdout
+`sharingancli --target target info domains`
+![info example](./info_example.png)
 
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
+## TODO in shor term
+*   Nmap interactive port storage
+*   add a way to do SYN / -sS scanning [ must be root so it presents a challenge ]
 
-GLOBAL OPTIONS:
-   --dns-wordlist value  Wordlist for DNS bruteforcing
-   --target value        Target domain
-   --skip-probe          Skips host-up nmap scan
-   --rescan              Scans domain regardless of the existance of previous results
-   --help, -h            show help
-   --version, -v         print the version
-
-```
-
-## TODO
-*   Tests -- next on the list
+## Roadmap? 
 *   Better progress bars
 *   JSON and regular file exports
 *   Automated scans through a daemon?
 *   Dir brute forcing
-*   Saving nmap scan data
-*   Mass nmap scans
 *   Possible Web ui / html export
