@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/leobeosab/sharingan/internal/models"
@@ -20,10 +19,10 @@ func TestOpenStore(t *testing.T) {
 func TestStoreAndRetrieve(t *testing.T) {
 	t.Logf("Testing Save & Retrieve Scan with custom db path")
 
-	expected := NewBasicScanResults()
+	expected := NewBasicProgram()
 	s := CreateBasicStoreAndEntry(expected, t)
 
-	ret := RetrieveScanResults(s, expected.RootDomain)
+	ret := RetrieveProgram(s, expected.ProgramName)
 	actual := ret[0]
 
 	if diff := cmp.Diff(expected, actual); diff != "" {
@@ -34,21 +33,17 @@ func TestStoreAndRetrieve(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	t.Logf("Testing Update scan results")
 
-	expected := NewBasicScanResults()
+	expected := NewBasicProgram()
 	s := CreateBasicStoreAndEntry(expected, t)
 
-	expected.Hosts = append(expected.Hosts,
+	expected.Hosts["testsubdomain"] =
 		models.Host{
-			IP:         "192.168.1.1",
-			Subdomains: []string{"router.asus"},
-			OpenPorts:  []int{22},
-			Http:       false,
-		},
-	)
+			Subdomain: "testsubdomain",
+		}
 
-	UpdateScan(s, &expected)
+	UpdateProgram(s, &expected)
 
-	ret := RetrieveScanResults(s, expected.RootDomain)
+	ret := RetrieveProgram(s, expected.ProgramName)
 	actual := ret[0]
 
 	if diff := cmp.Diff(expected, actual); diff != "" {
@@ -56,7 +51,7 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-func CreateBasicStoreAndEntry(m models.ScanResults, t *testing.T) *bolthold.Store {
+func CreateBasicStoreAndEntry(m models.Program, t *testing.T) *bolthold.Store {
 	// Create tmp file so we don't get same id errors
 	tmp, err := ioutil.TempFile(os.TempDir(), "sharingantesting-")
 	if err != nil {
@@ -65,22 +60,14 @@ func CreateBasicStoreAndEntry(m models.ScanResults, t *testing.T) *bolthold.Stor
 	defer os.Remove(tmp.Name())
 
 	s := OpenStore(tmp.Name())
-	SaveScan(s, &m)
+	SaveProgram(s, &m)
 
 	return s
 }
 
-func NewBasicScanResults() models.ScanResults {
-	return models.ScanResults{
-		RootDomain: "bestdomain.com",
-		Hosts: []models.Host{
-			models.Host{
-				IP:         "127.0.0.1",
-				Subdomains: []string{"self.home.com", "ride.fast", "eat.ass"},
-				OpenPorts:  []int{80, 443},
-				Http:       true,
-			},
-		},
-		DateLastScanned: time.Now(),
+func NewBasicProgram() models.Program {
+	return models.Program{
+		ProgramName: "test",
+		Hosts:       map[string]models.Host{"testhost": models.Host{}},
 	}
 }
