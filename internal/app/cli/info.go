@@ -8,12 +8,11 @@ import (
 )
 
 func PrintDomains(settings *models.ScanSettings) {
-	r := storage.RetrieveProgram(settings.Store, settings.Target)
-	if len(r) == 0 {
+	e, p := storage.RetrieveOrCreateProgram(settings.Store, settings.Target)
+	if !e {
 		fmt.Errorf("Error no program %s found", settings.Target)
 		return
 	}
-	p := r[0]
 
 	for s, _ := range p.Hosts {
 		fmt.Println(s)
