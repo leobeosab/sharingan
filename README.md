@@ -59,13 +59,9 @@ sharingancli --target target info domains
 ```
 ![info example](./info_example.png)
 
-## TODO in shor term
-*   Nmap interactive port storage
-*   add a way to do SYN / -sS scanning [ must be root so it presents a challenge ]
-
-## Roadmap? 
-*   Better progress bars
+## Features to come 
+*   Dir brute forcing -- Currently being worked on
 *   JSON and regular file exports
 *   Automated scans through a daemon?
-*   Dir brute forcing
+*   add a way to do SYN / -sS scanning [ must be root so it presents a challenge ]
 *   Possible Web ui / html export
