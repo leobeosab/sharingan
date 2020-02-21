@@ -39,6 +39,7 @@ func Scan(target string) []models.Port {
 	if len(result.Hosts) == 0 {
 		return ports
 	}
+
 	// No support for multiple hosts at once yet
 	for _, np := range result.Hosts[0].Ports {
 		p := models.Port{

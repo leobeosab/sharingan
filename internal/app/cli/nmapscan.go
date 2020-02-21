@@ -14,10 +14,9 @@ import (
 )
 
 func RunNmapScan(s *models.ScanSettings) {
-	exists, results := storage.ProgramEntryExists(s.Store, s.Target)
+	exists, p := storage.RetrieveOrCreateProgram(s.Store, s.Target)
 
 	if exists {
-		p := results[0]
 		log.Printf("Starting Nmap scan of %v hosts... this may take some time\n", len(p.Hosts))
 
 		hosts := make(chan models.Host, len(p.Hosts))
@@ -80,10 +79,9 @@ func RunNmapScan(s *models.ScanSettings) {
 }
 
 func RunNmapScanInteractive(s *models.ScanSettings) {
-	exists, results := storage.ProgramEntryExists(s.Store, s.Target)
+	exists, result := storage.RetrieveOrCreateProgram(s.Store, s.Target)
 
 	if exists {
-		result := results[0]
 		options := make([]string, 0)
 
 		for _, h := range result.Hosts {

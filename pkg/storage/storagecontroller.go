@@ -63,7 +63,7 @@ func UpdateProgram(s *bolthold.Store, p *models.Program) {
 }
 
 func UpdateOrCreateProgram(s *bolthold.Store, p *models.Program) {
-	e, _ := ProgramEntryExists(s, p.ProgramName)
+	e := len(RetrieveProgram(s, p.ProgramName)) > 0
 	if e {
 		UpdateProgram(s, p)
 	} else {
@@ -85,7 +85,14 @@ func RetrieveProgram(s *bolthold.Store, p string) []models.Program {
 	return results
 }
 
-func ProgramEntryExists(s *bolthold.Store, p string) (bool, []models.Program) {
-	results := RetrieveProgram(s, p)
-	return len(results) > 0, results
+// Returns: Exists -> bool, program -> models.Program
+func RetrieveOrCreateProgram(s *bolthold.Store, p string) (bool, models.Program) {
+	r := RetrieveProgram(s, p)
+	if len(r) > 0 {
+		return true, r[0]
+	}
+
+	return false, models.Program{
+		ProgramName: p,
+	}
 }
