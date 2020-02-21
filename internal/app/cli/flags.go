@@ -1,11 +1,10 @@
 package cli
 
 import (
-	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/urfave/cli/v2"
 )
 
-func GetGlobalFlags(s *models.ScanSettings) []cli.Flag {
+func GetGlobalFlags(s *settings) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "target",
@@ -28,11 +27,11 @@ func GetGlobalFlags(s *models.ScanSettings) []cli.Flag {
 	}
 }
 
-func GetNMapFlags(s *models.ScanSettings) []cli.Flag {
+func GetNMapFlags() []cli.Flag {
 	return []cli.Flag{}
 }
 
-func GetDNSFlags(s *models.ScanSettings) []cli.Flag {
+func GetDNSFlags(s *DNSSettings) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "dns-wordlist",

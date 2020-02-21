@@ -13,10 +13,10 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-func RunNmapScan(s *models.ScanSettings) {
-	exists, p := storage.RetrieveOrCreateProgram(s.Store, s.Target)
+func RunNmapScan() {
+	exists, p := storage.RetrieveOrCreateProgram(ScanSettings().Store, ScanSettings().Target)
 	if !exists {
-		log.Printf("Error: no program called %s found \n", s.Target)
+		log.Printf("Error: no program called %s found \n", ScanSettings().Target)
 		return
 	}
 
@@ -76,10 +76,10 @@ func RunNmapScan(s *models.ScanSettings) {
 	storage.UpdateProgram(s.Store, &p)
 }
 
-func RunNmapScanInteractive(s *models.ScanSettings) {
-	exists, result := storage.RetrieveOrCreateProgram(s.Store, s.Target)
+func RunNmapScanInteractive() {
+	exists, result := storage.RetrieveOrCreateProgram(ScanSettings().Store, ScanSettings().Target)
 	if !exists {
-		fmt.Printf("No scans found for %s", s.Target)
+		fmt.Printf("No scans found for %s", ScanSettings().Target)
 		return
 	}
 
@@ -117,5 +117,5 @@ func RunNmapScanInteractive(s *models.ScanSettings) {
 
 	helpers.PrintNmapScan(host)
 
-	storage.UpdateProgram(s.Store, &result)
+	storage.UpdateProgram(ScanSettings().Store, &result)
 }

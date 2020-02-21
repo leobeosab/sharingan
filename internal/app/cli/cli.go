@@ -5,24 +5,24 @@ import (
 	"log"
 	"os"
 
-	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/leobeosab/sharingan/pkg/storage"
 	"github.com/urfave/cli/v2"
 )
 
 func SetupCLI() {
 
-	settings := &models.ScanSettings{}
-
-	settings.Store = storage.OpenStore()
-	defer settings.Store.Close()
+	ScanSettings().Store = storage.OpenStore()
+	defer ScanSettings().Store.Close()
 
 	sharingan := cli.NewApp()
 	sharingan.Name = "Sharingan"
 	sharingan.Usage = "Wrapper and analyzer for offensive security recon tools"
 	sharingan.Version = "0.2.0"
 
-	sharingan.Flags = GetGlobalFlags(settings)
+	sharingan.Flags = GetGlobalFlags(ScanSettings())
+
+	dnsSettings := &DNSSettings{}
+
 	sharingan.Commands = []*cli.Command{
 		{
 			Name:  "dns",
@@ -35,18 +35,18 @@ func SetupCLI() {
 				{
 					Name:  "bruteforce",
 					Usage: "Brute force subdomains for a given rootdomain",
-					Flags: GetDNSFlags(settings),
+					Flags: GetDNSFlags(dnsSettings),
 					Action: func(c *cli.Context) error {
-						RunDNSRecon(settings)
+						RunDNSRecon(*dnsSettings)
 						return nil
 					},
 				},
 				{
 					Name:  "addsubs",
 					Usage: "Add subdomains to a given program using stdin ie : cat subs | sharingancli --target example DNS addsubs",
-					Flags: GetDNSFlags(settings),
+					Flags: GetDNSFlags(dnsSettings),
 					Action: func(c *cli.Context) error {
-						AddSubsFromInput(settings)
+						AddSubsFromInput(*dnsSettings)
 						return nil
 					},
 				},
@@ -55,19 +55,19 @@ func SetupCLI() {
 		{
 			Name:  "scan",
 			Usage: "Perform a service scan using nmap -sV : sharingancli --target ProgramName scan",
-			Flags: GetNMapFlags(settings),
+			Flags: GetNMapFlags(),
 			Subcommands: []*cli.Command{
 				{
 					Name:  "interactive",
 					Usage: "Manually select hosts from program to scan",
 					Action: func(c *cli.Context) error {
-						RunNmapScanInteractive(settings)
+						RunNmapScanInteractive()
 						return nil
 					},
 				},
 			},
 			Action: func(c *cli.Context) error {
-				RunNmapScan(settings)
+				RunNmapScan()
 				return nil
 			},
 		},
@@ -79,7 +79,7 @@ func SetupCLI() {
 					Name:  "domains",
 					Usage: "Prints subdomains for program/scan on stdout",
 					Action: func(c *cli.Context) error {
-						PrintDomains(settings)
+						PrintDomains()
 						return nil
 					},
 				},

@@ -3,14 +3,13 @@ package cli
 import (
 	"fmt"
 
-	"github.com/leobeosab/sharingan/internal/models"
 	"github.com/leobeosab/sharingan/pkg/storage"
 )
 
-func PrintDomains(settings *models.ScanSettings) {
-	e, p := storage.RetrieveOrCreateProgram(settings.Store, settings.Target)
+func PrintDomains() {
+	e, p := storage.RetrieveOrCreateProgram(ScanSettings().Store, ScanSettings().Target)
 	if !e {
-		fmt.Errorf("Error no program %s found", settings.Target)
+		fmt.Errorf("Error no program %s found", ScanSettings().Target)
 		return
 	}
 

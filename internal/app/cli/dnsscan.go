@@ -12,16 +12,16 @@ import (
 	"github.com/leobeosab/sharingan/pkg/storage"
 )
 
-func RunDNSRecon(settings *models.ScanSettings) {
-	if settings.Target == "" {
+func RunDNSRecon(settings DNSSettings) {
+	if ScanSettings().Target == "" {
 		log.Fatal("Target needs to be defined")
 	}
 	if settings.DNSWordlist == "" {
 		log.Fatalf("No program found - DNS Wordlist needs to be defined")
 	}
 
-	_, p := storage.RetrieveOrCreateProgram(settings.Store, settings.Target)
-	subs := dns.DNSBruteForce(settings.RootDomain, settings.DNSWordlist, settings.Threads)
+	_, p := storage.RetrieveOrCreateProgram(ScanSettings().Store, ScanSettings().Target)
+	subs := dns.DNSBruteForce(settings.RootDomain, settings.DNSWordlist, ScanSettings().Threads)
 
 	// Pesky progressbars not ending their lines
 	fmt.Printf("\n")
@@ -31,19 +31,19 @@ func RunDNSRecon(settings *models.ScanSettings) {
 		ReplaceSubsInProgram(&p, &subs)
 	}
 
-	storage.UpdateOrCreateProgram(settings.Store, &p)
+	storage.UpdateOrCreateProgram(ScanSettings().Store, &p)
 }
 
-func AddSubsFromInput(settings *models.ScanSettings) {
+func AddSubsFromInput(settings DNSSettings) {
 
 	info, err := os.Stdin.Stat()
 	if err != nil {
 		panic(err)
 	}
 
-	e, p := storage.RetrieveOrCreateProgram(settings.Store, settings.Target)
+	e, p := storage.RetrieveOrCreateProgram(ScanSettings().Store, ScanSettings().Target)
 	if !e {
-		fmt.Println(settings.Target + " not found in store, creating new entry")
+		fmt.Println(ScanSettings().Target + " not found in store, creating new entry")
 		p.Hosts = make(map[string]models.Host)
 	}
 
@@ -62,16 +62,16 @@ func AddSubsFromInput(settings *models.ScanSettings) {
 	}
 	subdomains = helpers.RemoveDuplicatesInSlice(subdomains)
 
-	cliOut := fmt.Sprintf("Added %v subdomains to %s \n", len(subdomains), settings.Target)
+	cliOut := fmt.Sprintf("Added %v subdomains to %s \n", len(subdomains), ScanSettings().Target)
 
 	if settings.ReplaceSubs {
 		ReplaceSubsInProgram(&p, &subdomains)
-		cliOut = fmt.Sprintf("Replacing subdomains for %s \n", settings.Target)
+		cliOut = fmt.Sprintf("Replacing subdomains for %s \n", ScanSettings().Target)
 	} else {
 		AddSubsToProgram(&p, &subdomains)
 	}
 
-	storage.UpdateOrCreateProgram(settings.Store, &p)
+	storage.UpdateOrCreateProgram(ScanSettings().Store, &p)
 
 	log.Printf(cliOut)
 }
