@@ -20,17 +20,7 @@ func RunDNSRecon(settings *models.ScanSettings) {
 		log.Fatalf("No program found - DNS Wordlist needs to be defined")
 	}
 
-	var p models.Program
-
-	r := storage.RetrieveProgram(settings.Store, settings.Target)
-	if len(r) != 0 {
-		p = r[0]
-	} else {
-		p = models.Program{
-			ProgramName: settings.Target,
-		}
-	}
-
+	_, p := storage.RetrieveOrCreateProgram(settings.Store, settings.Target)
 	subs := dns.DNSBruteForce(settings.RootDomain, settings.DNSWordlist, settings.Threads)
 
 	// Pesky progressbars not ending their lines
@@ -51,16 +41,10 @@ func AddSubsFromInput(settings *models.ScanSettings) {
 		panic(err)
 	}
 
-	var p models.Program
-	r := storage.RetrieveProgram(settings.Store, settings.Target)
-	if len(r) == 0 {
+	e, p := storage.RetrieveOrCreateProgram(settings.Store, settings.Target)
+	if !e {
 		fmt.Println(settings.Target + " not found in store, creating new entry")
-		p = models.Program{
-			ProgramName: settings.Target,
-			Hosts:       make(map[string]models.Host),
-		}
-	} else {
-		p = r[0]
+		p.Hosts = make(map[string]models.Host)
 	}
 
 	if info.Mode()&os.ModeNamedPipe == 0 {
