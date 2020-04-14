@@ -12,6 +12,7 @@ import (
 	"github.com/leobeosab/sharingan/pkg/storage"
 )
 
+// Runs DNS recon and adds found hosts to program
 func RunDNSRecon(settings *models.ScanSettings) {
 	if settings.Target == "" {
 		log.Fatal("Target needs to be defined")
@@ -32,9 +33,9 @@ func RunDNSRecon(settings *models.ScanSettings) {
 	}
 
 	subs := dns.DNSBruteForce(settings.RootDomain, settings.DNSWordlist, settings.Threads)
-
 	// Pesky progressbars not ending their lines
 	fmt.Printf("\n")
+
 	if settings.Rescan {
 		AddSubsToProgram(&p, &subs)
 	} else {
@@ -44,6 +45,7 @@ func RunDNSRecon(settings *models.ScanSettings) {
 	storage.UpdateOrCreateProgram(settings.Store, &p)
 }
 
+// Reads from STD in line by line adding hosts to program
 func AddSubsFromInput(settings *models.ScanSettings) {
 
 	info, err := os.Stdin.Stat()
@@ -63,6 +65,7 @@ func AddSubsFromInput(settings *models.ScanSettings) {
 		p = r[0]
 	}
 
+	// If there is no input in stdin, print an error
 	if info.Mode()&os.ModeNamedPipe == 0 {
 		log.Println("DNS addsubs is intended to work with pipies.")
 		log.Println("Usage: cat subs | sharingancli --target program dns addsubs")
@@ -92,6 +95,7 @@ func AddSubsFromInput(settings *models.ScanSettings) {
 	log.Printf(cliOut)
 }
 
+// Remove slice of subs for another
 func ReplaceSubsInProgram(p *models.Program, subs *[]string) {
 	p.Hosts = make(map[string]models.Host)
 	for _, s := range *subs {
@@ -102,6 +106,7 @@ func ReplaceSubsInProgram(p *models.Program, subs *[]string) {
 	}
 }
 
+// Add subs to a fiven program
 func AddSubsToProgram(p *models.Program, subs *[]string) {
 	for _, s := range *subs {
 		if _, ok := p.Hosts[s]; ok {

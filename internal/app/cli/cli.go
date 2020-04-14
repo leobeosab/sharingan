@@ -23,6 +23,8 @@ func SetupCLI() {
 	sharingan.Version = "0.2.0"
 
 	sharingan.Flags = GetGlobalFlags(settings)
+
+	// TODO: move commands to their own file
 	sharingan.Commands = []*cli.Command{
 		{
 			Name:  "dns",

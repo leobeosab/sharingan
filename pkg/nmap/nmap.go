@@ -13,6 +13,7 @@ func Scan(target string) []models.Port {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
+	// Get a basic scanner instance
 	scanner, err := nmap.NewScanner(
 		nmap.WithTargets(target),
 		nmap.WithContext(ctx),
@@ -27,6 +28,7 @@ func Scan(target string) []models.Port {
 	if err != nil {
 		log.Fatalf("Unable to run nmap scan: %v", err)
 
+		// Not all errors are fatal so just log any that appear
 		if len(result.NmapErrors) > 0 {
 			for e := range result.NmapErrors {
 				log.Println(e)
@@ -36,10 +38,12 @@ func Scan(target string) []models.Port {
 
 	ports := make([]models.Port, 0)
 
+	// Check to see if we actually have results
 	if len(result.Hosts) == 0 {
 		return ports
 	}
-	// No support for multiple hosts at once yet
+
+	// No support for multiple hosts at once for now
 	for _, np := range result.Hosts[0].Ports {
 		p := models.Port{
 			ID:          np.ID,

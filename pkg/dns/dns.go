@@ -24,14 +24,17 @@ func DNSBruteForce(rd string, wordlistPath string, threads int) []string {
 
 	// Output information to the users
 	log.Printf("Beginnning DNS Brute Force\n")
+	// TODO: Create helper methods for progress bars and prompts
 	// Progress bar :: Needs refactoring
 	lines := helpers.GetNumberOfLinesInFile(wordlist)
 	progress := progressbar.NewOptions(lines, progressbar.OptionSetPredictTime(false))
 
+	// Process jobs with async
 	jobs := make(chan string, lines)
 	subdomains := make(chan string, lines)
 	var wg sync.WaitGroup
 
+	// Create goroutines/"threads" and process incoming jobs
 	for i := 0; i < threads; i++ {
 		wg.Add(1)
 
@@ -62,8 +65,9 @@ func DNSBruteForce(rd string, wordlistPath string, threads int) []string {
 		log.Fatal(err)
 	}
 
+	// Cleanup
 	close(jobs)
-	wg.Wait()
+	wg.Wait() // Wait for all threads to complete
 	close(subdomains)
 
 	// Get all subdomains into a slice and remove dupes
