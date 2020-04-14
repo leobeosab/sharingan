@@ -22,6 +22,7 @@ func RunNmapScan() {
 
 	log.Printf("Starting Nmap scan of %v hosts... this may take some time\n", len(p.Hosts))
 
+	// Create channels for workers
 	hosts := make(chan models.Host, len(p.Hosts))
 	results := make(chan models.Host, len(p.Hosts))
 	var wg sync.WaitGroup

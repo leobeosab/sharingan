@@ -23,6 +23,7 @@ func SetupCLI() {
 
 	dnsSettings := &DNSSettings{}
 
+	// TODO: move commands to their own file
 	sharingan.Commands = []*cli.Command{
 		{
 			Name:  "dns",
