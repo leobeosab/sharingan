@@ -7,13 +7,15 @@ import (
 func GetGlobalFlags(s *settings) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Name:        "target",
+			Name:        "target-name",
+			Aliases:     []string{"target"},
 			Value:       "",
 			Usage:       "Target domain",
 			Destination: &s.Target,
 		},
 		&cli.IntFlag{
 			Name:        "threads",
+			Aliases:     []string{"t"},
 			Value:       20,
 			Usage:       "Max number of go routines",
 			Destination: &s.Threads,
@@ -34,13 +36,15 @@ func GetNMapFlags() []cli.Flag {
 func GetDNSFlags(s *DNSSettings) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Name:        "dns-wordlist",
+			Name:        "wordlist",
+			Aliases:     []string{"w", "dns-wordlist"},
 			Value:       "",
 			Usage:       "Wordlist for DNS bruteforcing",
 			Destination: &s.DNSWordlist,
 		},
 		&cli.StringFlag{
-			Name:        "root-domain",
+			Name:        "domain",
+			Aliases:     []string{"root-domain", "d"},
 			Value:       "",
 			Usage:       "Basis for subdomain scanning",
 			Destination: &s.RootDomain,
