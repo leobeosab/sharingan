@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/leobeosab/sharingan/pkg/dirb"
 	"github.com/leobeosab/sharingan/pkg/storage"
 	"github.com/urfave/cli/v2"
 )
@@ -22,6 +23,7 @@ func SetupCLI() {
 	sharingan.Flags = GetGlobalFlags(ScanSettings())
 
 	dnsSettings := &DNSSettings{}
+	dirbSettings := &DirbSettings{}
 
 	// TODO: move commands to their own file
 	sharingan.Commands = []*cli.Command{
@@ -51,6 +53,16 @@ func SetupCLI() {
 						return nil
 					},
 				},
+			},
+		},
+		{
+			Name:  "dirb",
+			Usage: "Perform a directory bust",
+			Flags: GetDirbFlags(dirbSettings),
+			Action: func(c *cli.Context) error {
+				fmt.Println("Starting brute force")
+				dirb.Dirb(dirbSettings.Domain, dirbSettings.Wordlist, 25)
+				return nil
 			},
 		},
 		{

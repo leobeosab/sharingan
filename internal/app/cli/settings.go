@@ -23,6 +23,12 @@ type DNSSettings struct {
 	DNSWordlist string
 }
 
+// DirbSettings data for CLI dirb CLI command
+type DirbSettings struct {
+	Domain   string
+	Wordlist string
+}
+
 func ScanSettings() *settings {
 	if s != nil {
 		return s

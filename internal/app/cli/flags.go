@@ -65,5 +65,24 @@ func GetDNSFlags(s *DNSSettings) []cli.Flag {
 			Destination: &s.Rescan,
 		},
 	}
+}
 
+// GetDirbFlags return flags to CLI command struct, add flags to settings struct
+func GetDirbFlags(s *DirbSettings) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:        "wordlist",
+			Aliases:     []string{"w", "dirb-wordlist"},
+			Value:       "",
+			Usage:       "Wordlist for directory busting",
+			Destination: &s.Wordlist,
+		},
+		&cli.StringFlag{
+			Name:        "domain",
+			Aliases:     []string{"d"},
+			Value:       "",
+			Usage:       "Domain + Path to start bruteforcing from",
+			Destination: &s.Domain,
+		},
+	}
 }
