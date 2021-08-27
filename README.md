@@ -6,7 +6,7 @@
 
 Sharingan is a recon multitool for offensive security / bug bounty
 
-This is very much a work in progress and I'm relatively new to offensive security in general so if you see something that can be improved please open an issue or PR with suggested changes.
+WIP, will I ever finish? Who knows
 
 ## Cloning for development
 Outside of your gopath
